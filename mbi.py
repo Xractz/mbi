@@ -212,7 +212,7 @@ def bfInstagram(users, password, command, newpassword):
 					t -= 1
 				continue
 
-			elif login == 'false':
+			if login == 'false':
 				print(f"[{R + B}!{C}]{username}|{password}")
 				die += 1
 
