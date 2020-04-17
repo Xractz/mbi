@@ -187,10 +187,8 @@ def loginInstagram(username, password):
 	"username":username,
 	"password":password,
 	}
-	try:
-		login = s.post(url_log, headers=headers, data=data)
-	except:
-		pass
+	
+	login = s.post(url_log, headers=headers, data=data)
 
 	cookie = login.cookies
 	result = login.text
