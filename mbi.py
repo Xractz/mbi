@@ -492,7 +492,7 @@ def main():
 
 		elif cmd.lower() == "n":
 			print(f"\n[{R + B}!{C}]Status   : Cracking please wait!")
-			result = bfInstagram(final, passwd, cmd, "")
+			result = bfInstagram(usr, passwd, cmd, "")
 			print(result)
 			print(f"[{G + B}+{C}]Saved on live.txt")
 			menu()
