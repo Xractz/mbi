@@ -209,8 +209,8 @@ def bfInstagram(users, password, command, newpassword):
 				login = re.findall(r"\"authenticated\"\: (.*?)\,", result)[0]
 			except IndexError:
 				print(f"[{R + B}!{C}](LIMIT)Please wait a few minutes before you try again.")
-				 t = 600
-				 while t:
+				t = 600
+				while t:
 				 	minu, sec = divmod(t, 60)
 				 	print(f"[{R + B}!{C}]Restarting from {minu}:{sec}", end="\r")
 				 	time.sleep(1)
